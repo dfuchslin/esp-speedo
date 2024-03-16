@@ -1,6 +1,7 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.3.5
+ * Configuration file for v8.3.11
+ * LilyGo T-RGB
  */
 
 /*
@@ -22,6 +23,10 @@
 /*====================
    COLOR SETTINGS
  *====================*/
+
+/* Maximal horizontal and vertical resolution to support by the library.*/
+#define LV_HOR_RES_MAX          (480)
+#define LV_VER_RES_MAX          (480)
 
 /*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
 #define LV_COLOR_DEPTH 16
@@ -46,7 +51,7 @@
  *=========================*/
 
 /*1: use custom malloc/free, 0: use the built-in `lv_mem_alloc()` and `lv_mem_free()`*/
-#define LV_MEM_CUSTOM 0
+#define LV_MEM_CUSTOM 1
 #if LV_MEM_CUSTOM == 0
     /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
     #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
@@ -60,10 +65,10 @@
     #endif
 
 #else       /*LV_MEM_CUSTOM*/
-    #define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
-    #define LV_MEM_CUSTOM_ALLOC   malloc
-    #define LV_MEM_CUSTOM_FREE    free
-    #define LV_MEM_CUSTOM_REALLOC realloc
+#define LV_MEM_CUSTOM_INCLUDE <esp32-hal-psram.h>//<stdlib.h>   /*Header for the dynamic memory function*/
+#define LV_MEM_CUSTOM_ALLOC   ps_malloc
+#define LV_MEM_CUSTOM_FREE    free
+#define LV_MEM_CUSTOM_REALLOC ps_realloc
 #endif     /*LV_MEM_CUSTOM*/
 
 /*Number of the intermediate memory buffer used during rendering and other internal processing mechanisms.
@@ -78,20 +83,20 @@
  *====================*/
 
 /*Default display refresh period. LVG will redraw changed areas with this period time*/
-#define LV_DISP_DEF_REFR_PERIOD 30      /*[ms]*/
+#define LV_DISP_DEF_REFR_PERIOD 10      /*[ms]*/
 
 /*Input device read period in milliseconds*/
 #define LV_INDEV_DEF_READ_PERIOD 30     /*[ms]*/
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#define LV_TICK_CUSTOM 1
+#define LV_TICK_CUSTOM 0
 #if LV_TICK_CUSTOM
-    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
+#define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+/*If using lvgl as ESP32 component*/
+// #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+// #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
 #endif   /*LV_TICK_CUSTOM*/
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
@@ -187,6 +192,14 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Enable RA6M3 G2D GPU*/
+#define LV_USE_GPU_RA6M3_G2D 0
+#if LV_USE_GPU_RA6M3_G2D
+/*include path of target processor
+    e.g. "hal_data.h"*/
+    #define LV_GPU_RA6M3_G2D_INCLUDE "hal_data.h"
+#endif
+
 /*Use SWM341's DMA2D GPU*/
 #define LV_USE_GPU_SWM341_DMA2D 0
 #if LV_USE_GPU_SWM341_DMA2D
@@ -271,9 +284,9 @@
  *-----------*/
 
 /*1: Show CPU usage and FPS count*/
-#define LV_USE_PERF_MONITOR 0
+#define LV_USE_PERF_MONITOR 1
 #if LV_USE_PERF_MONITOR
-    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_MID
 #endif
 
 /*1: Show the used memory and the memory fragmentation
@@ -293,7 +306,7 @@
     #define lv_snprintf  snprintf
     #define lv_vsnprintf vsnprintf
 #else   /*LV_SPRINTF_CUSTOM*/
-    #define LV_SPRINTF_USE_FLOAT 0
+    #define LV_SPRINTF_USE_FLOAT 1
 #endif  /*LV_SPRINTF_CUSTOM*/
 
 #define LV_USE_USER_DATA 1
@@ -353,25 +366,19 @@
 
 /*Montserrat fonts with ASCII range and some symbols using bpp = 4
  *https://fonts.google.com/specimen/Montserrat*/
-// #define LV_FONT_MONTSERRAT_8  1
-// #define LV_FONT_MONTSERRAT_10 1
-// #define LV_FONT_MONTSERRAT_12 1
-// #define LV_FONT_MONTSERRAT_14 1
-// #define LV_FONT_MONTSERRAT_16 1
-// #define LV_FONT_MONTSERRAT_18 1
 #define LV_FONT_MONTSERRAT_8  0
 #define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 0
+#define LV_FONT_MONTSERRAT_12 1
 #define LV_FONT_MONTSERRAT_14 1
-#define LV_FONT_MONTSERRAT_16 0
-#define LV_FONT_MONTSERRAT_18 0
-#define LV_FONT_MONTSERRAT_20 0
-#define LV_FONT_MONTSERRAT_22 0
+#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_18 1
+#define LV_FONT_MONTSERRAT_20 1
+#define LV_FONT_MONTSERRAT_22 1
 #define LV_FONT_MONTSERRAT_24 0
 #define LV_FONT_MONTSERRAT_26 0
 #define LV_FONT_MONTSERRAT_28 0
 #define LV_FONT_MONTSERRAT_30 0
-#define LV_FONT_MONTSERRAT_32 0
+#define LV_FONT_MONTSERRAT_32 1
 #define LV_FONT_MONTSERRAT_34 0
 #define LV_FONT_MONTSERRAT_36 0
 #define LV_FONT_MONTSERRAT_38 0
@@ -379,7 +386,7 @@
 #define LV_FONT_MONTSERRAT_42 0
 #define LV_FONT_MONTSERRAT_44 0
 #define LV_FONT_MONTSERRAT_46 0
-#define LV_FONT_MONTSERRAT_48 0
+#define LV_FONT_MONTSERRAT_48 1
 
 /*Demonstrate special features*/
 #define LV_FONT_MONTSERRAT_12_SUBPX      0
@@ -518,7 +525,6 @@
  *----------*/
 #define LV_USE_ANIMIMG    1
 
-// #define LV_USE_CALENDAR   1
 #define LV_USE_CALENDAR   1
 #if LV_USE_CALENDAR
     #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
@@ -589,8 +595,7 @@
 #define LV_USE_THEME_BASIC 1
 
 /*A theme designed for monochrome displays*/
-// #define LV_USE_THEME_MONO 1
-#define LV_USE_THEME_MONO 0
+#define LV_USE_THEME_MONO 1
 
 /*-----------
  * Layouts
@@ -617,11 +622,11 @@
 #endif
 
 /*API for open, read, etc*/
-#define LV_USE_FS_POSIX 0
+#define LV_USE_FS_POSIX 1
 #if LV_USE_FS_POSIX
-    #define LV_FS_POSIX_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
-    #define LV_FS_POSIX_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
-    #define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#define LV_FS_POSIX_LETTER 'A'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#define LV_FS_POSIX_PATH "/sdcard"         /*Set the working directory. File/directory paths will be appended to it.*/
+#define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
 /*API for CreateFile, ReadFile, etc*/
@@ -639,21 +644,28 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
+/*API for LittleFS (library needs to be added separately). Uses lfs_file_open, lfs_file_read, etc*/
+#define LV_USE_FS_LITTLEFS 0
+#if LV_USE_FS_LITTLEFS
+#define LV_FS_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_LITTLEFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
 /*PNG decoder library*/
-#define LV_USE_PNG 0
+#define LV_USE_PNG 1
 
 /*BMP decoder library*/
-#define LV_USE_BMP 0
+#define LV_USE_BMP 1
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#define LV_USE_SJPG 0
+#define LV_USE_SJPG 1
 
 /*GIF decoder library*/
-#define LV_USE_GIF 0
+#define LV_USE_GIF 1
 
 /*QR code library*/
-#define LV_USE_QRCODE 0
+#define LV_USE_QRCODE 1
 
 /*FreeType library*/
 #define LV_USE_FREETYPE 0
@@ -670,6 +682,13 @@
         #define LV_FREETYPE_CACHE_FT_FACES 0
         #define LV_FREETYPE_CACHE_FT_SIZES 0
     #endif
+#endif
+
+/*Tiny TTF library*/
+#define LV_USE_TINY_TTF 0
+#if LV_USE_TINY_TTF
+/*Load TTF data from files*/
+    #define LV_TINY_TTF_FILE_SUPPORT 0
 #endif
 
 /*Rlottie library*/
@@ -703,7 +722,7 @@
 #define LV_USE_IMGFONT 0
 
 /*1: Enable a published subscriber based messaging system */
-#define LV_USE_MSG 0
+#define LV_USE_MSG 1
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
@@ -728,6 +747,7 @@
 *==================*/
 
 /*Enable the examples to be built with the library*/
+//#define LV_BUILD_EXAMPLES 0
 #define LV_BUILD_EXAMPLES 1
 
 /*===================
@@ -735,15 +755,18 @@
  ====================*/
 
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-#define LV_USE_DEMO_WIDGETS 0
+//#define LV_USE_DEMO_WIDGETS 0
+#define LV_USE_DEMO_WIDGETS 1
 #if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW 0
+#define LV_DEMO_WIDGETS_SLIDESHOW 1
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
-#define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+//#define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER 1
 
 /*Benchmark your system*/
+//#define LV_USE_DEMO_BENCHMARK 0
 #define LV_USE_DEMO_BENCHMARK 1
 #if LV_USE_DEMO_BENCHMARK
 /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
@@ -751,16 +774,17 @@
 #endif
 
 /*Stress test for LVGL*/
-#define LV_USE_DEMO_STRESS 0
+//#define LV_USE_DEMO_STRESS 0
+#define LV_USE_DEMO_STRESS 1
 
 /*Music player demo*/
 #define LV_USE_DEMO_MUSIC 0
 #if LV_USE_DEMO_MUSIC
-    #define LV_DEMO_MUSIC_SQUARE    1
-    #define LV_DEMO_MUSIC_LANDSCAPE 1
-    #define LV_DEMO_MUSIC_ROUND     1
-    #define LV_DEMO_MUSIC_LARGE     1
-    #define LV_DEMO_MUSIC_AUTO_PLAY 1
+#define LV_DEMO_MUSIC_SQUARE    0
+    #define LV_DEMO_MUSIC_LANDSCAPE 0
+    #define LV_DEMO_MUSIC_ROUND     0
+    #define LV_DEMO_MUSIC_LARGE     0
+    #define LV_DEMO_MUSIC_AUTO_PLAY 0
 #endif
 
 /*--END OF LV_CONF_H--*/
