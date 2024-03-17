@@ -14,10 +14,12 @@ static void btn_event_cb(lv_event_t *e) {
     if (code == LV_EVENT_CLICKED) {
         static uint8_t cnt = 0;
         cnt++;
+        cnt = cnt > 16 ? 1 : cnt;
         /*Get the first child of the button which is the label and change its text*/
         lv_obj_t *label = lv_obj_get_child(btn, 0);
         lv_label_set_text_fmt(label, "Button: %d", cnt);
         Serial.printf("Button :%d\n", cnt);
+        panel.setBrightness(cnt);
     }
 }
 
@@ -52,7 +54,7 @@ void display_service::setup() {
     lv_obj_center(btn_label);
 
     // Turn on the backlight and set it to the highest value, ranging from 0 to 16
-    panel.setBrightness(16);
+    panel.setBrightness(8);
 }
 
 void display_service::loop() {
